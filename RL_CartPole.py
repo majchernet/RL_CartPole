@@ -13,7 +13,7 @@ verbose = False
 env = gym.make('CartPole-v0')
 
 # Discount Rate
-discountRate = 0.91
+discountRate = 0.98
 
 # Number of runs experiment
 NR = 100
@@ -138,6 +138,7 @@ def runEpisode(env, T, eve, render = False):
     global allStates
     global discreteSpace
     global maxBoundaries
+    global discountRate
  
     # All states in single episode
     episodeStates = []
@@ -153,10 +154,10 @@ def runEpisode(env, T, eve, render = False):
         if eve > np.random.random(): #random explore
             action = env.action_space.sample()
             if verbose:
-                print "random move {0}".format(action)
+                print ("random move {0}".format(action))
         else: # get best action for curent state 
             if verbose:
-                print "get best policy action"
+                print ("get best policy action")
             action = getBestAction(observation)
         
         if (render):
@@ -170,13 +171,11 @@ def runEpisode(env, T, eve, render = False):
 
         if done:
             # backward calculate rewards for episode 
-            for move in range(len (episodeStates)-1,-1,-1):
-                update = episodeStates[move][3] * discountRate**move
+            for move in range(len (episodeStates)-1,0,-1):
+                update = episodeStates[move][3] * discountRate ** (len (episodeStates)-1-move)
 
-                if (update < 0.01): #minimal update that matter 
-                    break
-
-                totalReward = totalReward + update
+                if (update > 0.01): #minimal update that matter 
+                    totalReward += update
 
                 # add totalreward to states table
                 episodeStates[move].append(totalReward)
@@ -238,10 +237,8 @@ if __name__ == "__main__":
 
         print ("Run {} max last 100 explore try mean {}".format(e,maxi))
 
-        if (maxi > 195):
-            for j in range (100):
-                t = runEpisode(env, T, 0, True)
-                print ("Test {0} - score {1}".format(j,t))
+        res = runEpisode(env, T, 0, True)
+        print ("Test: score {}".format(t))
     
     
     print (minBoundaries)
