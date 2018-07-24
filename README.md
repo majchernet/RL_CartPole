@@ -4,4 +4,3 @@ Script for solve CartPole problem from OpenAI Gym:
 2. Ignore cart position component
 
 It ends successfully by achieving the result mean higher than 195 every few runs.
-# RL_CartPole_NN
